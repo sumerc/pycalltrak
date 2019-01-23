@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 import inspect
 import traceback
 
@@ -10,9 +11,6 @@ _unique_ncalls = 0
 
 
 class Node(object):
-    #__slots__ = ('val', 'parent', 'max_width', 'x', 'y', 'x_margin', 'children',
-    #             '_t0', 'elapsed')
-
     def __init__(self, val, parent):
         self.val = val
         self.parent = parent
@@ -23,6 +21,7 @@ class Node(object):
         self._t0 = 0
         self.elapsed = 0
         self.children = []
+
         if parent:
             parent.children.append(self)
 
@@ -66,7 +65,10 @@ def _trace_calls(frame, event, arg):
             'exception_value': None
         }
         parent_node = _get_parent(frame)
+
+        # constructor will add itself in parent.children, thus we preserve call order
         cur_node = Node(d, parent_node)
+
         if not parent_node:
             _root = cur_node
         _frame_node_dict[frame] = cur_node
@@ -96,7 +98,7 @@ def stop():
     sys.settrace(None)
 
 
-def _stats_pre_processing():
+def _pre_process_stats():
     '''
     Calculates the max_width, coords, unique call count...etc,
     generally the stuff that is needed to render a valid callgraph with ease.
@@ -149,9 +151,6 @@ def _stats_pre_processing():
         else:
             unique_calls.add(node.val['call_formatted'])
 
-        # TODO: Maybe hold a heap instead of this
-        #node.children = sorted(node.children, key=attrgetter('max_width'))
-
         c_x = node.x
         for child in node.children:
             child.x_margin = _get_x_margin(child)
@@ -165,20 +164,39 @@ def _stats_pre_processing():
 
 
 def get_summary():
-    _stats_pre_processing()
+    _pre_process_stats()
 
     return f"{len(_frame_node_dict)} call(s) in total. " \
         f"{100 * (len(_frame_node_dict) - _unique_ncalls) // len(_frame_node_dict)}% " \
         f"of them are recurring calls."
 
 
-def get_stats():
-    _stats_pre_processing()
+class Stats(object):
+    def __iter__(self):
+        # do a level order traversal on stats
+        stats_q = [_root]
+        while stats_q:
+            node = stats_q.pop()
+            yield node
+            for child in node.children:
+                stats_q.insert(0, child)
 
-    # do a level order traversal on stats
-    stats_q = [_root]
-    while stats_q:
-        node = stats_q.pop()
-        yield node
-        for child in node.children:
-            stats_q.insert(0, child)
+    def to_json(self):
+        class NodeEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, Node):
+                    obj_dict = obj.__dict__.copy()
+                    del obj_dict['parent']
+                    return obj_dict
+
+                raise Exception(
+                    'Type %s not supported for encoding' % (type(obj)))
+
+        #default=lambda o: o.__dict__
+        return json.dumps(_root, cls=NodeEncoder, indent=4)
+
+
+def get_stats():
+    _pre_process_stats()
+
+    return Stats()

@@ -43,10 +43,10 @@ def fib(n):
     if n <= 1:
         return n
 
-    time.sleep(0.3)
+    #time.sleep(0.3)
 
-    r = fib(n - 1) + fib(n - 2)
-    return r
+    result = fib(n - 1) + fib(n - 2)
+    return result
 
 
 calltrak.start()
@@ -56,16 +56,8 @@ fib(10)
 #cc([1, 2, 5], 5)
 calltrak.stop()
 
-for node in calltrak.get_stats():
-    #print(node, node.max_width)
-    #import jsonpickle
-    import json
-    #d = json.dumps(json.loads(jsonpickle.encode(node)), indent=4)
-    #print(d)
-    c = json.dumps(node, default=lambda o: o.__dict__)
-    print(c)
-    break
+import json
 
-#wrapper(main)
-#summary = calltrak.get_summary()
-#print(summary)
+#for node in calltrak.get_stats():
+#    node.parent = None
+print(calltrak.get_stats().to_json())
