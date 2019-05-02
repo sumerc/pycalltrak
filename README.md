@@ -1,5 +1,5 @@
 # pycalltrak
-Call Trace Analyzer&amp;Visualizer
+Poor Man's Call Trace Analyzer&amp;Visualizer
 
 It is a bit different than normal callgraph outputs. PyCalltrak will output every function call with different arguments. This means if a function is called multiple times with different arguments, then all of those calls will be visible in the callgraph as distinct nodes.
 
