@@ -3,7 +3,9 @@ Poor Man's Call Trace Analyzer&amp;Visualizer
 
 It is a bit different than normal callgraph outputs. PyCalltrak will output every function call with different arguments. This means if a function is called multiple times with different arguments, then all of those calls will be visible in the callgraph as distinct nodes.
 
-This project is a *toy project* and used specifically while developing/trying out/playing with different algorithms on various subjects. I used calltrak summary and visualizer(it still outputs ASCII, a GUI backend can be easily written) to find repetitive calls happening throughout the execution flow. It might help on various situations like these where you would have a complex algorithm(possibly recursive) that is called multiple times and pycalltrak might shine in those kind of situations since you can visualize or get summary on  what has happened in runtime. An example is worth thousand words.
+This project is a *toy project* and used specifically while developing/trying out/playing with different algorithms on various subjects. I used calltrak summary and visualizer(it still outputs ASCII, a GUI backend can be easily written) to find repetitive calls happening throughout the execution flow. It might help on various situations like these where you would have a complex algorithm(possibly recursive) that is called multiple times. pycalltrak might shine in those kind of situations since you can visualize/get summary on what has happened in runtime. 
+
+An example is worth thousand words.
 
 Following is a Travelling Salesman Problem Solver using Top-Down Dynamic Programming algorithm:
 ```python
@@ -39,12 +41,12 @@ It will output following:
 13700 call(s) in total. 13650(99%) recurring call(s).
 ```
 
-Now if you enable lru_cache decorator which enables memoization on the function and re-run the example:
+If you enable lru_cache decorator which enables memoization on the function and re-run the example:
 ```
 449 call(s) in total. 0(0%) recurring call(s).
 ```
 
-Now, if you would like to visualize the call graph at this point, pycalltrak already have outlined the x,y coords needed to print out the stats. If you want to do it in your own way, then you need to traverse the callgraph and decide the topology of the graph yourself. A simple example using a single coordinate to print out a Left-Aligned call graph:
+If you would like to visualize the call graph at this point, pycalltrak already have outlined the x,y coords needed to print out the stats. If you want to do it in your own way, then you need to traverse the callgraph and decide the topology of the graph yourself. A simple example using a single coordinate to print out a Left-Aligned call graph:
 
 ```python
 for stat in stats:
